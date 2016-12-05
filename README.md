@@ -5,6 +5,6 @@ Villains Academy.
 
 ## How to Use ##
 
-'''shell
+```shell
 ruby directory.rb
-'''
+```
