@@ -7,32 +7,32 @@ def input_students
   poss_cohorts = ["january", "february", "march", "april", "may", "june",
             "july", "august", "september", "october", "november", "december"]
 
-  name = gets.delete("\n")
+  name = STDIN.gets.delete("\n")
 
   while !name.empty? do
     puts "And which cohort is #{name} in?"
-    cohort = gets.delete("\n")
+    cohort = STDIN.gets.delete("\n")
     if cohort == ""
       cohort = :january
     elsif poss_cohorts.include?(cohort)
       cohort = cohort.to_sym
     else
       puts "I'm sorry, I didn't quite catch that. Which cohort is #{name} in?"
-      cohort = gets.delete("\n")
+      cohort = STDIN.gets.delete("\n")
     end
     puts "What are #{name}'s hobbies? (Please list any hobbies, separated with a comma)"
-    hobbies = gets.delete("\n")
+    hobbies = STDIN.gets.delete("\n")
     puts "Where was #{name} born?"
-    country = gets.delete("\n")
+    country = STDIN.gets.delete("\n")
     puts "What is #{name}'s height?"
-    height = gets.delete("\n")
+    height = STDIN.gets.delete("\n")
     @students << {name: name, cohort: cohort, hobbies: [hobbies.split(", ")], country_of_birth: country, height: height}
     if @students.length == 1
       puts "Now we have #{@students.count} student"
     else
       puts "Now we have #{@students.count} students"
     end
-    name = gets.delete("\n")
+    name = STDIN.gets.delete("\n")
   end
   if @students.length < 1
     puts "You've not provided any students!"
@@ -41,9 +41,10 @@ def input_students
 end
 
 def interactive_menu
+  try_load_students
   loop do
     print_menu
-    process(gets.chomp)
+    process(STDIN.gets.chomp)
   end
 end
 
@@ -90,13 +91,25 @@ def save_students
   file.close
 end
 
-def load_students
-  file = File.open("students.csv", "r")
+def load_students(filename = "students.csv")
+  file = File.open(filename, "r")
   file.readlines.each do |line|
     name, cohort = line.chomp.split(",")
     @students << {name: name, cohort: cohort.to_sym}
   end
   file.close
+end
+
+def try_load_students
+  filename = ARGV.first #first argument from the command line
+  return if filename.nil? # get out of the metho if it isn't given
+  if File.exists?(filename) #if it exists
+    load_students(filename)
+    puts "Loaded #{@students.count} from #{filename}"
+  else # if the file doesn't exist
+    puts "Sorry, #{filename} doesn't exist."
+    exit
+  end
 end
 
 
@@ -117,7 +130,7 @@ end
 def names_with_specific_letter
   puts "To search for individual students,"
   puts "please provide the first letter of their name"
-  letter = gets.delete("\n").upcase
+  letter = STDIN.gets.delete("\n").upcase
   puts ("The students with names beginning with the letter #{letter} are:").center(80)
   @students.each do |student|
     puts (student[:name]).center(80) if student[:name][0] == letter
@@ -137,7 +150,7 @@ end
 
 def print_by_cohort
   puts "To search for students by cohort, please provide a cohort (month)"
-  cohort = gets.delete("\n").to_sym
+  cohort = STDIN.gets.delete("\n").to_sym
   @students.each do |student|
     puts (student[:name]).center(80) if student[:cohort] == cohort
   end
